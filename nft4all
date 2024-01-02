@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: AGPL-3.0
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract MyNFT is ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+    
+    // Definiendo la cantidad máxima de tokens
+    uint256 public constant MAX_SUPPLY = 10000;
+
+    // Constructor del contrato
+  constructor() ERC721("01012024", "matic") Ownable(msg.sender) {}
+ 
+    // Función para crear y enviar un nuevo token con un URI asociado
+    function createAndSendToken(address to, string memory _tokenURI) public {
+        // Verificando que no se haya alcanzado el límite máximo de tokens
+        require(_tokenIdCounter.current() < MAX_SUPPLY, "No se pueden crear mas tokens");
+
+        // Obteniendo el próximo ID de token
+        uint256 newItemId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+
+        // Mintando el nuevo token y asignándolo al destinatario
+        _safeMint(to, newItemId);
+
+        // Estableciendo el URI del token
+        _setTokenURI(newItemId, _tokenURI);
+    }
+
+    // Función para verificar si un token existe
+    function exists(uint256 _tokenId) public view returns (bool) {
+        // Verificando que el ID de token sea válido
+        require(_tokenId > 0, "ID de token no vlido");
+        return exists(_tokenId);
+    }
+}
